@@ -1,4 +1,14 @@
 /*
+added willChange style property with value "transform" to each elem. This tells the browser the elems will be transformed at some stage and allows the browser to optimize for this.
+
+this read statement does not need to be repeated every loop iteration as the pizza sizes are all the same.
+this value only needs to be computed once as all the pizzas will have the same newwidth value.
+this expression need only be computed once, instead of before every loop iteration
+this expression needs only be computed once, instead of every loop iteration
+time to resize Pizzas: 3.93ms average
+*/
+
+/*
 Welcome to the 60fps project! Your goal is to make Cam's Pizzeria website run
 jank-free at 60 frames per second.
 
@@ -450,10 +460,12 @@ var resizePizzas = function(size) {
 
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
-    for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
-      var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
-      var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
-      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+    var dx = determineDx(document.querySelector(".randomPizzaContainer"), size); // this read statement does not need to be repeated every loop iteration as the pizza sizes are all the same.
+    var newwidth = (document.querySelectorAll(".randomPizzaContainer").offsetWidth + dx) + 'px'; // this value only needs to be computed once as all the pizzas will have the same newwidth value.
+    var length = document.querySelectorAll(".randomPizzaContainer").length; // this expression need only be computed once, instead of before every loop iteration
+    var randomPizzaContainerNodeList = document.querySelectorAll(".randomPizzaContainer"); // this expression needs only be computed once, instead of every loop iteration
+    for (var i = 0; i < length; i++) { // time to resize Pizzas: 3.93ms average
+      randomPizzaContainerNodeList[i].style.width = newwidth;
     }
   }
 
@@ -503,10 +515,18 @@ function updatePositions() {
   window.performance.mark("mark_start_frame");
 
   var items = document.querySelectorAll('.mover');
-  for (var i = 0; i < items.length; i++) {
-    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
-    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
-  }
+
+  function computationToOccurBeforeNextRePaint() {
+    for (var i = 0; i < items.length; i++) {
+      var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+      items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+      //items[i].style.transform = "translateX(items[i].basicLeft + 100 * phase + 'px')";
+      //items[i].style.transform = "translateX(5px)";
+    };
+    window.requestAnimationFrame(computationToOccurBeforeNextRePaint);
+  };
+
+  window.requestAnimationFrame(computationToOccurBeforeNextRePaint);
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
   // Super easy to create custom metrics.
@@ -534,6 +554,7 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.basicLeft = (i % cols) * s;
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
     document.querySelector("#movingPizzas1").appendChild(elem);
+    elem.style.willChange = "transform";
   }
   updatePositions();
 });
