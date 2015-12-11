@@ -5,6 +5,7 @@ index.html:
 - moved CSS media quer and those styles for smartphone device screensizes into a separate css file. This file will be downloaded by the browser regardless of the media attribute in the link element, but will only apply when the media query is true.
 - added the media="print" attribute to the link element for the print.css file. This means that the stylesheet will be downloaed by the browser but only applied when the media query is true.
 - made google analytics javascript async
+- included styles for smartphone and main (style.css) styles within index.html in the style element. this reduced browser requests and optimized the delivery of CSS.
 
 
 ## Website Performance Optimization portfolio project
