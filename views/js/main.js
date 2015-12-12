@@ -1,11 +1,64 @@
 /*
-added willChange style property with value "transform" to each elem. This tells the browser the elems will be transformed at some stage and allows the browser to optimize for this.
 
-this read statement does not need to be repeated every loop iteration as the pizza sizes are all the same.
-this value only needs to be computed once as all the pizzas will have the same newwidth value.
-this expression need only be computed once, instead of before every loop iteration
-this expression needs only be computed once, instead of every loop iteration
-time to resize Pizzas: 3.93ms average
+### Optimizations regarding changePizzaSizes:
+
+The original code was as follows:
+```
+ function changePizzaSizes(size) {
+    for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
+      var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
+      var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
+      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+    }
+  }
+
+```
+After optimizing JavaScript operation, the code is as follows:
+
+```
+var randomPizzaContainerNodeList = document.querySelectorAll(".randomPizzaContainer"); // this expression needs only be computed once, instead of every loop iteration
+    var dx = determineDx(randomPizzaContainerNodeList[0], size); // since all the pizza elements are the same, the first element in the nodeList can be used to determine the dx
+    var newwidth = (randomPizzaContainerNodeList[0].offsetWidth + dx) + 'px'; // ditto as above
+    function changePizzaSizes(size) {
+      for (var i = 0; i < randomPizzaContainerNodeList.length; i++) {
+        randomPizzaContainerNodeList[i].style.width = newwidth;
+      };
+    };
+
+```
+The above optimizations revolve around improving read and write JavaScript operation execution order so as to reduce execution time. The operation order significantly improves paint time.
+
+### Optimizations regarding movingPizzas:
+
+The origin code for this function is:
+
+```
+ var items = document.querySelectorAll('.mover');
+  for (var i = 0; i < items.length; i++) {
+    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+  }
+
+```
+My modified, optimized code is as follows:
+
+```
+
+  var items = document.querySelectorAll('.mover');
+
+  function computationToOccurBeforeNextRePaint() {
+    for (var i = 0; i < items.length; i++) {
+      var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+      items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+    };
+    window.requestAnimationFrame(computationToOccurBeforeNextRePaint);
+  };
+
+  window.requestAnimationFrame(computationToOccurBeforeNextRePaint);
+
+```
+The optimization leverages requestAnimationFrame API and effectively ensures that all JavaScript computation required for the next animation is handled before the next animation frame.
+
 */
 
 /*
@@ -459,15 +512,14 @@ var resizePizzas = function(size) {
   }
 
   // Iterates through pizza elements on the page and changes their widths
-  function changePizzaSizes(size) {
-    var dx = determineDx(document.querySelector(".randomPizzaContainer"), size); // this read statement does not need to be repeated every loop iteration as the pizza sizes are all the same.
-    var newwidth = (document.querySelectorAll(".randomPizzaContainer").offsetWidth + dx) + 'px'; // this value only needs to be computed once as all the pizzas will have the same newwidth value.
-    var length = document.querySelectorAll(".randomPizzaContainer").length; // this expression need only be computed once, instead of before every loop iteration
     var randomPizzaContainerNodeList = document.querySelectorAll(".randomPizzaContainer"); // this expression needs only be computed once, instead of every loop iteration
-    for (var i = 0; i < length; i++) { // time to resize Pizzas: 3.93ms average
-      randomPizzaContainerNodeList[i].style.width = newwidth;
-    }
-  }
+    var dx = determineDx(randomPizzaContainerNodeList[0], size); // since all the pizza elements are the same, the first element in the nodeList can be used to determine the dx
+    var newwidth = (randomPizzaContainerNodeList[0].offsetWidth + dx) + 'px'; // ditto as above
+    function changePizzaSizes(size) {
+      for (var i = 0; i < randomPizzaContainerNodeList.length; i++) {
+        randomPizzaContainerNodeList[i].style.width = newwidth;
+      };
+    };
 
   changePizzaSizes(size);
 
@@ -520,8 +572,6 @@ function updatePositions() {
     for (var i = 0; i < items.length; i++) {
       var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
       items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
-      //items[i].style.transform = "translateX(items[i].basicLeft + 100 * phase + 'px')";
-      //items[i].style.transform = "translateX(5px)";
     };
     window.requestAnimationFrame(computationToOccurBeforeNextRePaint);
   };
@@ -554,7 +604,6 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.basicLeft = (i % cols) * s;
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
     document.querySelector("#movingPizzas1").appendChild(elem);
-    elem.style.willChange = "transform";
   }
   updatePositions();
 });

@@ -1,11 +1,77 @@
-## My changes ##
-index.html:
+### My changes
+
+#### index.html:
 
 - changed loading of Google Web Font from CSS stylesheet to JavaScript async external load.
-- moved CSS media quer and those styles for smartphone device screensizes into a separate css file. This file will be downloaded by the browser regardless of the media attribute in the link element, but will only apply when the media query is true.
 - added the media="print" attribute to the link element for the print.css file. This means that the stylesheet will be downloaed by the browser but only applied when the media query is true.
-- made google analytics javascript async
-- included styles for smartphone and main (style.css) styles within index.html in the style element. this reduced browser requests and optimized the delivery of CSS.
+- changed google analytics javascript to be async
+- included styles for smartphone and main (style.css) styles within index.html in the style element. This reduced browser requests and optimized the delivery of CSS.
+
+My last PageSpeed check had the following results:
+
+93/100 Mobile
+96/100 Desktop
+
+#### pizza.html:
+
+[[ Optimizations regarding changePizzaSizes: ]]
+
+The original code was as follows:
+```
+ function changePizzaSizes(size) {
+    for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
+      var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
+      var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
+      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+    }
+  }
+
+```
+After optimizing JavaScript operation, the code is as follows:
+
+```
+var randomPizzaContainerNodeList = document.querySelectorAll(".randomPizzaContainer"); // this expression needs only be computed once, instead of every loop iteration
+    var dx = determineDx(randomPizzaContainerNodeList[0], size); // since all the pizza elements are the same, the first element in the nodeList can be used to determine the dx
+    var newwidth = (randomPizzaContainerNodeList[0].offsetWidth + dx) + 'px'; // ditto as above
+    function changePizzaSizes(size) {
+      for (var i = 0; i < randomPizzaContainerNodeList.length; i++) {
+        randomPizzaContainerNodeList[i].style.width = newwidth;
+      };
+    };
+
+```
+The above optimizations revolve around improving read and write JavaScript operation execution order so as to reduce execution time. The operation order significantly improves paint time.
+
+[[ Optimizations regarding movingPizzas: ]]
+
+The original code for this function is:
+
+```
+ var items = document.querySelectorAll('.mover');
+  for (var i = 0; i < items.length; i++) {
+    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+  }
+
+```
+My modified, optimized code is as follows:
+
+```
+
+  var items = document.querySelectorAll('.mover');
+
+  function computationToOccurBeforeNextRePaint() {
+    for (var i = 0; i < items.length; i++) {
+      var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+      items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+    };
+    window.requestAnimationFrame(computationToOccurBeforeNextRePaint);
+  };
+
+  window.requestAnimationFrame(computationToOccurBeforeNextRePaint);
+
+```
+The optimization leverages requestAnimationFrame API and effectively ensures that all JavaScript computation required for the next animation is handled before the next animation frame.
 
 
 ## Website Performance Optimization portfolio project
