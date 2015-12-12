@@ -1,3 +1,15 @@
+### How do you run this application?
+
+1) git clone the repository
+2) open the folder frontend-nanodegree-mobile-portfolio
+3) open index.html in Chrome or similar browser
+4) click Cam's Pizzeria link
+5) Open Chrome Dev Tools console
+6) Change the pizza slider's size and observe the time it takes to resize pizzas
+7) Open Chrome Dev Tools FPS meter (https://developer.chrome.com/devtools/docs/rendering-settings)
+8) Scroll down and up on the pizza.html page and observe constant 60 FPS
+9) serve index.html through Page Speed Insights to check Google PageSpeed score for Mobile and Desktop
+
 ### My changes
 
 #### index.html:
