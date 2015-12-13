@@ -45,8 +45,9 @@ After optimizing JavaScript operation, the code is as follows:
 var randomPizzaContainerNodeList = document.querySelectorAll(".randomPizzaContainer"); // this expression needs only be computed once, instead of every loop iteration
     var dx = determineDx(randomPizzaContainerNodeList[0], size); // since all the pizza elements are the same, the first element in the nodeList can be used to determine the dx
     var newwidth = (randomPizzaContainerNodeList[0].offsetWidth + dx) + 'px'; // ditto as above
+    var length = randomPizzaContainerNodeList.length; // this computation need only be done once so the for loop statement has a variable to reference instead of computing the value every iteration
     function changePizzaSizes(size) {
-      for (var i = 0; i < randomPizzaContainerNodeList.length; i++) {
+      for (var i = 0; i < length; i++) {
         randomPizzaContainerNodeList[i].style.width = newwidth;
       };
     };
