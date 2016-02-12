@@ -1,3 +1,8 @@
+### About this project
+
+This project revolved around web performance optimization. We were give source code for a website that performs very poorly in terms of "time to paint" (rendering), JavaScript efficiency, frame rate or "jank". We had to optimize the code to meet minimum Google PageSpeed requirements, JavaScript function execution time and frame rates.
+
+
 ### How do you run this application?
 
 1) git clone the repository
@@ -10,7 +15,7 @@
 8) Scroll down and up on the pizza.html page and observe constant 60 FPS
 9) serve index.html through Page Speed Insights to check Google PageSpeed score for Mobile and Desktop
 
-### My changes
+### My changes from origin source code
 
 #### index.html:
 
@@ -87,7 +92,7 @@ My modified, optimized code is as follows:
 The optimization leverages requestAnimationFrame API and effectively ensures that all JavaScript computation required for the next animation is handled before the next animation frame.
 
 
-## Website Performance Optimization portfolio project
+## Website Performance Optimization portfolio project --- Udacity's brief:
 
 Your challenge, if you wish to accept it (and we sure hope you will), is to optimize this online portfolio for speed! In particular, optimize the critical rendering path and make this page render as quickly as possible by applying the techniques you've picked up in the [Critical Rendering Path course](https://www.udacity.com/course/ud884).
 
